@@ -34,7 +34,9 @@ export function ThemeToggle() {
 
 export function BackgroundOrbs() {
   return (
-    <div className="bg-orbs" aria-hidden>
+    <div className="bg-scene" aria-hidden>
+      <div className="bg-grid" />
+      <div className="bg-glow" />
       <div className="orb orb-1" />
       <div className="orb orb-2" />
       <div className="orb orb-3" />

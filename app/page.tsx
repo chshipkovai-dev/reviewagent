@@ -11,6 +11,7 @@ type Invoice = {
   amount: number
   days_overdue: number
   description: string
+  paid?: boolean
 }
 
 type Lang = 'en' | 'ru' | 'cs'
@@ -44,9 +45,15 @@ const translations = {
     finalNotice: '⚠️ Final Notice',
     copy: 'Copy',
     copied: '✓ Copied!',
+    markPaid: 'Mark paid',
+    paid: 'Paid',
     getStarted: 'Get started — it\'s free',
     heroTitle: 'Stop chasing\nclients for money.',
     heroSub: 'AI writes your follow-up emails in seconds.',
+    statOutstanding: 'Outstanding',
+    statInvoices: 'Invoices',
+    statAvgDays: 'Avg Days',
+    statEmails: 'Emails Sent',
     // Validation
     required: 'This field is required',
     amountInvalid: 'Enter a valid amount (e.g. 1500)',
@@ -81,9 +88,15 @@ const translations = {
     finalNotice: '⚠️ Финальное',
     copy: 'Копировать',
     copied: '✓ Скопировано!',
+    markPaid: 'Оплачено',
+    paid: 'Оплачен',
     getStarted: 'Начать бесплатно',
     heroTitle: 'Хватит гоняться\nза оплатой.',
     heroSub: 'AI напишет follow-up письма за вас.',
+    statOutstanding: 'К получению',
+    statInvoices: 'Инвойсов',
+    statAvgDays: 'Среднее дней',
+    statEmails: 'Писем отправлено',
     required: 'Это поле обязательно',
     amountInvalid: 'Введите корректную сумму (например, 1500)',
     daysInvalid: 'Введите количество дней от 1 до 999',
@@ -117,9 +130,15 @@ const translations = {
     finalNotice: '⚠️ Finální',
     copy: 'Kopírovat',
     copied: '✓ Zkopírováno!',
+    markPaid: 'Zaplaceno',
+    paid: 'Zaplacena',
     getStarted: 'Začít zdarma',
     heroTitle: 'Přestaňte honit\nplatby.',
     heroSub: 'AI napíše vaše upomínkové e-maily za vás.',
+    statOutstanding: 'Pohledávky',
+    statInvoices: 'Faktur',
+    statAvgDays: 'Prům. dní',
+    statEmails: 'E-mailů odesláno',
     required: 'Toto pole je povinné',
     amountInvalid: 'Zadejte platnou částku (např. 1500)',
     daysInvalid: 'Zadejte platný počet dní (1–999)',
@@ -148,6 +167,8 @@ export default function Home() {
   const [emails, setEmails] = useState<{ id: string; versions: string[] } | null>(null)
   const [copied, setCopied] = useState<number | null>(null)
   const [lang, setLang] = useState<Lang>('en')
+  const [paidIds, setPaidIds] = useState<Set<string>>(new Set())
+  const [emailsGenerated, setEmailsGenerated] = useState(0)
 
   const supabase = createClient()
 
@@ -216,7 +237,12 @@ export default function Home() {
     })
     const data = await res.json()
     setEmails({ id: invoice.id, versions: data.versions })
+    setEmailsGenerated(prev => prev + 1)
     setGenerating(null)
+  }
+
+  function markPaid(id: string) {
+    setPaidIds(prev => new Set([...prev, id]))
   }
 
   async function copyEmail(text: string, idx: number) {
@@ -276,6 +302,12 @@ export default function Home() {
     )
   }
 
+  const unpaidInvoices = invoices.filter(inv => !paidIds.has(inv.id))
+  const totalOutstanding = unpaidInvoices.reduce((s, inv) => s + inv.amount, 0)
+  const avgDays = unpaidInvoices.length
+    ? Math.round(unpaidInvoices.reduce((s, inv) => s + inv.days_overdue, 0) / unpaidInvoices.length)
+    : 0
+
   // ── Logged in ───────────────────────────────────────────────
   return (
     <div style={{ maxWidth: 720, margin: '0 auto', padding: '40px 20px' }}>
@@ -313,6 +345,28 @@ export default function Home() {
           </button>
         </div>
       </div>
+
+      {/* Stats row */}
+      {!loading && invoices.length > 0 && (
+        <div className="animate-fade-up delay-1" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 24 }}>
+          <div className="stat-card">
+            <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--muted)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.5px' }}>{tr.statOutstanding}</div>
+            <div style={{ fontSize: 22, fontWeight: 800, letterSpacing: '-0.5px', color: 'var(--text)' }}>${totalOutstanding.toLocaleString()}</div>
+          </div>
+          <div className="stat-card">
+            <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--muted)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.5px' }}>{tr.statInvoices}</div>
+            <div style={{ fontSize: 22, fontWeight: 800, letterSpacing: '-0.5px', color: 'var(--text)' }}>{unpaidInvoices.length}</div>
+          </div>
+          <div className="stat-card">
+            <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--muted)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.5px' }}>{tr.statAvgDays}</div>
+            <div style={{ fontSize: 22, fontWeight: 800, letterSpacing: '-0.5px', color: avgDays >= 30 ? 'var(--warning)' : 'var(--text)' }}>{avgDays}</div>
+          </div>
+          <div className="stat-card">
+            <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--muted)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.5px' }}>{tr.statEmails}</div>
+            <div style={{ fontSize: 22, fontWeight: 800, letterSpacing: '-0.5px', color: 'var(--accent)' }}>{emailsGenerated * 3}</div>
+          </div>
+        </div>
+      )}
 
       {/* Add invoice form */}
       {showForm && (
@@ -380,14 +434,15 @@ export default function Home() {
       ) : (
         <div className="animate-fade-up" style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           {invoices.map(inv => {
-            const color = overdueColor(inv.days_overdue)
+            const isPaid = paidIds.has(inv.id)
+            const color = isPaid ? 'var(--success)' : overdueColor(inv.days_overdue)
             const isGen = generating === inv.id
             const hasEmails = emails?.id === inv.id
 
             return (
               <div key={inv.id}>
                 {/* Invoice card */}
-                <div className="card" style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '16px 20px' }}>
+                <div className={`invoice-card${isPaid ? ' paid' : ''}`}>
                   {/* Days badge */}
                   <div style={{
                     minWidth: 60, textAlign: 'center',
@@ -400,30 +455,44 @@ export default function Home() {
 
                   {/* Info */}
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontWeight: 600, fontSize: 15, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                      {inv.client_name}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: inv.description ? 2 : 0 }}>
+                      <span style={{ fontWeight: 600, fontSize: 15, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        {inv.client_name}
+                      </span>
+                      {isPaid && <span className="badge badge-success">{tr.paid}</span>}
                     </div>
                     {inv.description && (
-                      <div style={{ fontSize: 12, color: 'var(--muted)', marginTop: 2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      <div style={{ fontSize: 12, color: 'var(--muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                         {inv.description}
                       </div>
                     )}
                   </div>
 
                   {/* Amount */}
-                  <div style={{ fontWeight: 700, fontSize: 18, color: 'var(--text)', flexShrink: 0 }}>
+                  <div style={{ fontWeight: 700, fontSize: 18, color: isPaid ? 'var(--muted)' : 'var(--text)', flexShrink: 0 }}>
                     ${inv.amount.toLocaleString()}
                   </div>
 
-                  {/* Action */}
-                  <button
-                    className="btn-primary"
-                    onClick={() => generate(inv)}
-                    disabled={isGen}
-                    style={{ whiteSpace: 'nowrap', minWidth: 140, fontSize: 13, padding: '9px 16px', flexShrink: 0 }}
-                  >
-                    {isGen ? tr.writing : tr.writeEmail}
-                  </button>
+                  {/* Actions */}
+                  {!isPaid ? (
+                    <>
+                      <button
+                        className="btn-primary"
+                        onClick={() => generate(inv)}
+                        disabled={isGen}
+                        style={{ whiteSpace: 'nowrap', minWidth: 136, fontSize: 13, padding: '9px 16px', flexShrink: 0 }}
+                      >
+                        {isGen ? tr.writing : tr.writeEmail}
+                      </button>
+                      <button
+                        className="btn-success btn-sm"
+                        onClick={() => markPaid(inv.id)}
+                        style={{ flexShrink: 0 }}
+                      >
+                        {tr.markPaid}
+                      </button>
+                    </>
+                  ) : null}
                 </div>
 
                 {/* Email versions */}
@@ -432,7 +501,7 @@ export default function Home() {
                     {emails!.versions.map((text, i) => {
                       const labels = [tr.friendly, tr.firm, tr.finalNotice]
                       return (
-                        <div key={i} className="card" style={{ borderColor: emailBorders[i], padding: '18px 20px' }}>
+                        <div key={i} className="email-card" style={{ borderColor: emailBorders[i] }}>
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
                             <span style={{ fontSize: 12, fontWeight: 600, color: emailColors[i] }}>{labels[i]}</span>
                             <button
