@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { ThemeToggle } from '@/components/theme-provider'
 
 type Lang = 'en' | 'ru' | 'cs'
 
@@ -86,7 +87,11 @@ export default function UpgradePage() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
+    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+      <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '20px 28px 0' }}>
+        <ThemeToggle />
+      </div>
+      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
       <div className="animate-fade-up" style={{ maxWidth: 420, width: '100%' }}>
 
         {/* Logo */}
@@ -168,6 +173,7 @@ export default function UpgradePage() {
             {tr.back}
           </a>
         </div>
+      </div>
       </div>
     </div>
   )

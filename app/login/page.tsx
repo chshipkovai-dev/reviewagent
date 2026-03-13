@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase'
+import { ThemeToggle } from '@/components/theme-provider'
 
 type Lang = 'en' | 'ru' | 'cs'
 
@@ -113,8 +114,9 @@ export default function LoginPage() {
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
 
-      {/* Language switcher */}
-      <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '20px 28px 0' }} className="animate-fade-in">
+      {/* Top bar: lang + theme */}
+      <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 8, padding: '20px 28px 0' }} className="animate-fade-in">
+        <ThemeToggle />
         <div style={{ display: 'flex', gap: 4, background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 10, padding: 4 }}>
           {(['en', 'ru', 'cs'] as Lang[]).map(l => (
             <button

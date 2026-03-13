@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase'
 import { User } from '@supabase/supabase-js'
+import { ThemeToggle } from '@/components/theme-provider'
 
 type Invoice = {
   id: string
@@ -293,6 +294,7 @@ export default function Home() {
           <p style={{ fontSize: 13, color: 'var(--muted)', marginLeft: 38 }}>{tr.tagline}</p>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+          <ThemeToggle />
           {/* Lang switcher */}
           <div style={{ display: 'flex', gap: 2, background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 8, padding: 3 }}>
             {(['en', 'ru', 'cs'] as Lang[]).map(l => (
