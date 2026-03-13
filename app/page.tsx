@@ -146,6 +146,22 @@ const translations = {
   },
 }
 
+function Field({ id, label, error, children }: { id: string; label: string; error?: string; children: React.ReactNode }) {
+  return (
+    <div>
+      <label htmlFor={id} style={{ fontSize: 12, fontWeight: 500, color: 'var(--muted)', display: 'block', marginBottom: 7 }}>
+        {label}
+      </label>
+      {children}
+      {error && (
+        <div style={{ color: 'var(--danger)', fontSize: 12, marginTop: 5, display: 'flex', alignItems: 'center', gap: 4 }}>
+          <span>⚠</span> {error}
+        </div>
+      )}
+    </div>
+  )
+}
+
 const EMPTY_FORM = { client_name: '', amount: '', days_overdue: '', description: '' }
 const EMPTY_ERRORS = { client_name: '', amount: '', days_overdue: '' }
 
@@ -249,22 +265,6 @@ export default function Home() {
     await navigator.clipboard.writeText(text)
     setCopied(idx)
     setTimeout(() => setCopied(null), 2000)
-  }
-
-  function Field({ id, label, error, children }: { id: string; label: string; error?: string; children: React.ReactNode }) {
-    return (
-      <div>
-        <label htmlFor={id} style={{ fontSize: 12, fontWeight: 500, color: 'var(--muted)', display: 'block', marginBottom: 7 }}>
-          {label}
-        </label>
-        {children}
-        {error && (
-          <div style={{ color: 'var(--danger)', fontSize: 12, marginTop: 5, display: 'flex', alignItems: 'center', gap: 4 }}>
-            <span>⚠</span> {error}
-          </div>
-        )}
-      </div>
-    )
   }
 
   // ── Not logged in ───────────────────────────────────────────
