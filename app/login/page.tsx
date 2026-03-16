@@ -1,31 +1,43 @@
 'use client'
 
-// ── VARIANT B4: ORBIT / COMMAND CENTER ──────────────────────
-// Dark warm full-bleed with orbiting floating invoice cards
-// Central form card with gold ring glow
-// Particle dots background
-// Feels like a live operations dashboard
-
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase'
 
 type Lang = 'en' | 'ru' | 'cs'
+type Mode = 'signin' | 'signup' | 'reset'
 
 const T = {
   en: {
     badge: 'LIVE · Invoice automation',
     title: 'Get paid.\nOn time.\nEvery time.',
     sub: 'AI writes the perfect follow-up email for every overdue invoice. 3 tones. 10 seconds.',
-    label: 'Email address',
-    placeholder: 'you@example.com',
-    submit: 'Start free →',
-    submitting: 'Sending link...',
-    hint: 'No credit card · No password',
-    sentTitle: 'You\'re in ✦',
-    sentSub: (e: string) => `Magic link sent to ${e}`,
-    err: 'Something went wrong.',
+    tabSignIn: 'Sign In',
+    tabSignUp: 'Sign Up',
+    labelEmail: 'Email address',
+    labelPassword: 'Password',
+    labelConfirm: 'Confirm password',
+    placeholderEmail: 'you@example.com',
+    placeholderPassword: '••••••••',
+    submitSignIn: 'Sign in →',
+    submitSignUp: 'Create account →',
+    submitReset: 'Send reset link →',
+    submitting: 'Please wait...',
+    forgotPassword: 'Forgot password?',
+    backToSignIn: '← Back to sign in',
+    resetTitle: 'Reset password',
+    resetSub: 'Enter your email and we\'ll send a reset link.',
+    hint: 'Your data is secure · End-to-end encrypted',
+    sentSignUp: 'Check your email ✦',
+    sentSignUpSub: (e: string) => `Verification link sent to ${e}. Click it to activate your account.`,
+    sentReset: 'Reset link sent ✦',
+    sentResetSub: (e: string) => `Check ${e} for the password reset link.`,
     errEmail: 'Enter your email.',
-    errInvalid: 'Invalid email.',
+    errInvalid: 'Invalid email address.',
+    errPassword: 'Password must be at least 8 characters.',
+    errConfirm: 'Passwords do not match.',
+    errWrong: 'Invalid email or password.',
+    errUsed: 'This email is already registered. Sign in instead.',
+    err: 'Something went wrong. Try again.',
     floats: [
       { label: 'Acme Corp', amount: '$3,200', days: '60 days', status: 'danger', icon: '⚠' },
       { label: 'Studio K', amount: '$1,800', days: '32 days', status: 'warning', icon: '!' },
@@ -33,22 +45,38 @@ const T = {
       { label: 'DevShop', amount: '$4,500', days: '45 days', status: 'danger', icon: '⚠' },
       { label: 'TechVenture', amount: '$920', days: 'Paid ✓', status: 'success', icon: '✓' },
     ],
-    variantLabel: 'Gold variants:',
   },
   ru: {
     badge: 'LIVE · Автоматизация инвойсов',
     title: 'Получай деньги.\nВовремя.\nКаждый раз.',
     sub: 'AI пишет идеальное follow-up письмо для каждого просроченного инвойса. 3 тона. 10 секунд.',
-    label: 'Email адрес',
-    placeholder: 'you@example.com',
-    submit: 'Начать бесплатно →',
-    submitting: 'Отправляем...',
-    hint: 'Без карты · Без пароля',
-    sentTitle: 'Вы внутри ✦',
-    sentSub: (e: string) => `Magic link отправлен на ${e}`,
-    err: 'Что-то пошло не так.',
+    tabSignIn: 'Войти',
+    tabSignUp: 'Регистрация',
+    labelEmail: 'Email адрес',
+    labelPassword: 'Пароль',
+    labelConfirm: 'Подтвердите пароль',
+    placeholderEmail: 'you@example.com',
+    placeholderPassword: '••••••••',
+    submitSignIn: 'Войти →',
+    submitSignUp: 'Создать аккаунт →',
+    submitReset: 'Отправить ссылку →',
+    submitting: 'Подождите...',
+    forgotPassword: 'Забыли пароль?',
+    backToSignIn: '← Назад',
+    resetTitle: 'Сброс пароля',
+    resetSub: 'Введите email — пришлём ссылку для сброса.',
+    hint: 'Ваши данные защищены · Шифрование',
+    sentSignUp: 'Проверьте почту ✦',
+    sentSignUpSub: (e: string) => `Ссылка подтверждения отправлена на ${e}. Нажмите её чтобы активировать аккаунт.`,
+    sentReset: 'Ссылка отправлена ✦',
+    sentResetSub: (e: string) => `Проверьте ${e} — там ссылка для сброса пароля.`,
     errEmail: 'Введите email.',
     errInvalid: 'Некорректный email.',
+    errPassword: 'Пароль минимум 8 символов.',
+    errConfirm: 'Пароли не совпадают.',
+    errWrong: 'Неверный email или пароль.',
+    errUsed: 'Этот email уже зарегистрирован. Войдите.',
+    err: 'Что-то пошло не так. Попробуйте снова.',
     floats: [
       { label: 'Acme Corp', amount: '$3,200', days: '60 дней', status: 'danger', icon: '⚠' },
       { label: 'Studio K', amount: '$1,800', days: '32 дня', status: 'warning', icon: '!' },
@@ -56,22 +84,38 @@ const T = {
       { label: 'DevShop', amount: '$4,500', days: '45 дней', status: 'danger', icon: '⚠' },
       { label: 'TechVenture', amount: '$920', days: 'Оплачено ✓', status: 'success', icon: '✓' },
     ],
-    variantLabel: 'Gold варианты:',
   },
   cs: {
     badge: 'LIVE · Automatizace faktur',
     title: 'Dostávejte peníze.\nVčas.\nPokaždé.',
     sub: 'AI napíše dokonalý upomínkový e-mail pro každou fakturu po splatnosti. 3 tóny. 10 sekund.',
-    label: 'E-mailová adresa',
-    placeholder: 'vy@example.com',
-    submit: 'Začít zdarma →',
-    submitting: 'Odesíláme...',
-    hint: 'Bez karty · Bez hesla',
-    sentTitle: 'Jste uvnitř ✦',
-    sentSub: (e: string) => `Magic link odeslán na ${e}`,
-    err: 'Něco se pokazilo.',
+    tabSignIn: 'Přihlásit se',
+    tabSignUp: 'Registrace',
+    labelEmail: 'E-mailová adresa',
+    labelPassword: 'Heslo',
+    labelConfirm: 'Potvrdit heslo',
+    placeholderEmail: 'vy@example.com',
+    placeholderPassword: '••••••••',
+    submitSignIn: 'Přihlásit se →',
+    submitSignUp: 'Vytvořit účet →',
+    submitReset: 'Odeslat odkaz →',
+    submitting: 'Čekejte...',
+    forgotPassword: 'Zapomněli jste heslo?',
+    backToSignIn: '← Zpět',
+    resetTitle: 'Obnovit heslo',
+    resetSub: 'Zadejte e-mail a zašleme odkaz pro obnovu.',
+    hint: 'Vaše data jsou zabezpečena · Šifrování',
+    sentSignUp: 'Zkontrolujte e-mail ✦',
+    sentSignUpSub: (e: string) => `Ověřovací odkaz odeslán na ${e}. Klikněte na něj pro aktivaci účtu.`,
+    sentReset: 'Odkaz odeslán ✦',
+    sentResetSub: (e: string) => `Zkontrolujte ${e} — tam je odkaz pro obnovu hesla.`,
     errEmail: 'Zadejte e-mail.',
-    errInvalid: 'Neplatný e-mail.',
+    errInvalid: 'Neplatná e-mailová adresa.',
+    errPassword: 'Heslo musí mít alespoň 8 znaků.',
+    errConfirm: 'Hesla se neshodují.',
+    errWrong: 'Neplatný e-mail nebo heslo.',
+    errUsed: 'Tento e-mail je již registrován. Přihlaste se.',
+    err: 'Něco se pokazilo. Zkuste to znovu.',
     floats: [
       { label: 'Acme Corp', amount: '$3,200', days: '60 dní', status: 'danger', icon: '⚠' },
       { label: 'Studio K', amount: '$1,800', days: '32 dní', status: 'warning', icon: '!' },
@@ -79,11 +123,9 @@ const T = {
       { label: 'DevShop', amount: '$4,500', days: '45 dní', status: 'danger', icon: '⚠' },
       { label: 'TechVenture', amount: '$920', days: 'Zaplaceno ✓', status: 'success', icon: '✓' },
     ],
-    variantLabel: 'Gold varianty:',
   },
 }
 
-// Float card positions [top%, left%, animDelay, floatDuration]
 const POSITIONS = [
   { top:'12%', left:'6%', delay:0, dur:6 },
   { top:'18%', right:'7%', delay:0.8, dur:7 },
@@ -91,6 +133,8 @@ const POSITIONS = [
   { top:'68%', right:'6%', delay:0.4, dur:6.5 },
   { top:'40%', left:'2%', delay:1.8, dur:7.5 },
 ]
+
+const FLOAT_ANIMS = ['b4float0','b4float1','b4float2','b4float3','b4float4']
 
 const CSS = `
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
@@ -160,7 +204,6 @@ const CSS = `
   animation:b4up 0.6s ease both;
 }
 
-/* Gold ring glow behind the card */
 .b4-ring{
   position:absolute;inset:-2px;border-radius:26px;
   background:conic-gradient(from 0deg,rgba(245,158,11,0.0),rgba(245,158,11,0.3) 25%,rgba(245,158,11,0.0) 50%,rgba(245,158,11,0.2) 75%,rgba(245,158,11,0.0));
@@ -195,50 +238,89 @@ const CSS = `
 
 /* Title */
 .b4-title{
-  font-size:clamp(28px,3.5vw,36px);font-weight:900;
+  font-size:clamp(26px,3.5vw,34px);font-weight:900;
   letter-spacing:-1px;line-height:1.15;white-space:pre-line;
-  margin-bottom:12px;
+  margin-bottom:10px;
   background:linear-gradient(150deg,#FBBF24 0%,#F59E0B 40%,#D97706 100%);
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
 }
-.b4-sub{font-size:13px;color:rgba(255,255,255,0.35);line-height:1.65;margin-bottom:24px;}
+.b4-sub{font-size:12px;color:rgba(255,255,255,0.32);line-height:1.6;margin-bottom:22px;}
 
+/* Mode Tabs */
+.b4-tabs{
+  display:flex;gap:2px;padding:3px;
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(255,255,255,0.07);
+  border-radius:12px;margin-bottom:20px;
+}
+.b4-tab{
+  flex:1;padding:9px;border:none;border-radius:9px;
+  font-size:13px;font-weight:600;cursor:pointer;transition:all 0.15s;
+  background:transparent;color:rgba(255,255,255,0.35);
+}
+.b4-tab.on{
+  background:rgba(245,158,11,0.15);color:#F59E0B;
+}
+
+/* Inputs */
+.b4-field{margin-bottom:14px;}
+.b4-label{font-size:11px;font-weight:700;color:rgba(255,255,255,0.32);display:block;margin-bottom:7px;letter-spacing:0.5px;text-transform:uppercase;}
 .b4-input{
   width:100%;background:rgba(255,255,255,0.05);
   border:1px solid rgba(255,255,255,0.09);
-  border-radius:12px;padding:14px 16px;
+  border-radius:12px;padding:13px 16px;
   color:#F5F0E8;font-size:15px;outline:none;transition:all 0.2s;
 }
-.b4-input::placeholder{color:rgba(255,255,255,0.2);}
+.b4-input::placeholder{color:rgba(255,255,255,0.18);}
 .b4-input:focus{border-color:rgba(245,158,11,0.55);background:rgba(245,158,11,0.05);box-shadow:0 0 0 3px rgba(245,158,11,0.12);}
 .b4-input.err{border-color:rgba(255,77,107,0.5);}
+.b4-err-msg{color:#FF4D6B;font-size:12px;margin-top:5px;display:flex;align-items:center;gap:4px;}
 
 .b4-btn{
-  width:100%;padding:15px;border:none;border-radius:12px;
+  width:100%;padding:14px;border:none;border-radius:12px;
   font-size:15px;font-weight:700;cursor:pointer;
   color:#1A0D00;letter-spacing:-0.2px;
   background:linear-gradient(135deg,#D97706 0%,#F59E0B 50%,#FDE68A 100%);
   background-size:200% 100%;
   box-shadow:0 4px 20px rgba(245,158,11,0.35),0 0 0 1px rgba(245,158,11,0.2);
-  transition:all 0.25s;position:relative;overflow:hidden;
+  transition:all 0.25s;position:relative;overflow:hidden;margin-top:4px;
 }
 .b4-btn::after{content:'';position:absolute;top:0;left:-100%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.28),transparent);animation:b4shimmer 2.5s 0.8s ease-in-out infinite;}
 .b4-btn:hover{background-position:100% 0;transform:translateY(-2px);box-shadow:0 8px 28px rgba(245,158,11,0.45);}
 .b4-btn:disabled{opacity:0.65;cursor:not-allowed;transform:none;}
 
+.b4-forgot{
+  text-align:right;margin-top:-8px;margin-bottom:14px;
+}
+.b4-forgot button{
+  background:none;border:none;cursor:pointer;
+  font-size:12px;color:rgba(245,158,11,0.6);
+  transition:color 0.15s;
+}
+.b4-forgot button:hover{color:#F59E0B;}
+
+.b4-hint{font-size:12px;color:rgba(255,255,255,0.18);text-align:center;margin-top:14px;display:flex;align-items:center;justify-content:center;gap:6px;}
+.b4-hint-icon{opacity:0.5;}
+
+/* Sent state */
+.b4-sent{text-align:center;padding:8px 0;}
+.b4-sent-icon{font-size:42px;margin-bottom:14px;animation:b4bounce 0.5s cubic-bezier(0.34,1.56,0.64,1) both;}
+.b4-sent-title{font-size:20px;font-weight:700;color:#F5F0E8;letter-spacing:-0.4px;margin-bottom:8px;}
+.b4-sent-sub{font-size:13px;color:rgba(255,255,255,0.38);line-height:1.65;}
+
 /* Stats inline */
 .b4-stats{
-  display:flex;gap:0;margin-top:20px;
+  display:flex;gap:0;margin-top:18px;
   background:rgba(255,255,255,0.03);
   border:1px solid rgba(255,255,255,0.06);
   border-radius:12px;overflow:hidden;
 }
-.b4-stat{flex:1;padding:11px 12px;text-align:center;border-right:1px solid rgba(255,255,255,0.06);}
+.b4-stat{flex:1;padding:10px 12px;text-align:center;border-right:1px solid rgba(255,255,255,0.06);}
 .b4-stat:last-child{border-right:none;}
-.b4-stat-v{font-size:16px;font-weight:800;color:#F5F0E8;letter-spacing:-0.4px;}
+.b4-stat-v{font-size:15px;font-weight:800;color:#F5F0E8;letter-spacing:-0.4px;}
 .b4-stat-l{font-size:10px;color:rgba(255,255,255,0.25);margin-top:2px;font-weight:500;}
 
-/* ── LANG ── */
+/* Lang */
 .b4-lang{
   position:fixed;top:20px;right:20px;z-index:20;
   display:flex;gap:2px;padding:3px;
@@ -248,7 +330,7 @@ const CSS = `
 .b4-lang-btn{padding:5px 11px;border-radius:7px;font-size:11px;font-weight:600;background:transparent;color:rgba(255,255,255,0.3);border:none;cursor:pointer;transition:all 0.15s;}
 .b4-lang-btn.on{background:rgba(245,158,11,0.15);color:#F59E0B;}
 
-/* ── LOGO ── */
+/* Logo */
 .b4-logo{
   position:fixed;top:20px;left:20px;z-index:20;
   display:flex;align-items:center;gap:9px;
@@ -260,22 +342,7 @@ const CSS = `
   box-shadow:0 3px 12px rgba(245,158,11,0.3);
 }
 
-/* ── SENT ── */
-.b4-sent{text-align:center;}
-.b4-sent-icon{font-size:42px;margin-bottom:14px;animation:b4bounce 0.5s cubic-bezier(0.34,1.56,0.64,1) both;}
-
-/* ── VNAV ── */
-.b4-vnav{
-  position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
-  display:flex;align-items:center;gap:6px;
-  background:rgba(8,5,3,0.9);backdrop-filter:blur(16px);
-  border:1px solid rgba(245,158,11,0.15);border-radius:999px;
-  padding:8px 16px;font-size:12px;color:rgba(255,255,255,0.3);z-index:100;
-}
-.b4-vlink{padding:4px 12px;border-radius:999px;font-size:12px;font-weight:600;text-decoration:none;transition:all 0.15s;color:rgba(255,255,255,0.4);}
-.b4-vlink:hover{color:white;background:rgba(255,255,255,0.08);}
-.b4-vlink.on{background:rgba(245,158,11,0.15);color:#F59E0B;}
-
+/* Keyframes */
 @keyframes b4up{from{opacity:0;transform:translateY(24px);}to{opacity:1;transform:translateY(0);}}
 @keyframes b4entrance{from{opacity:0;transform:scale(0.9)translateY(10px);}to{opacity:1;transform:scale(1)translateY(0);}}
 @keyframes b4shimmer{0%{left:-100%;}50%,100%{left:150%;}}
@@ -289,34 +356,84 @@ const CSS = `
 @keyframes spin{to{transform:rotate(360deg);}}
 `
 
-const FLOAT_ANIMS = ['b4float0','b4float1','b4float2','b4float3','b4float4']
-
-export default function LoginB4() {
+export default function LoginPage() {
   const [email, setEmail] = useState('')
-  const [emailError, setEmailError] = useState('')
-  const [status, setStatus] = useState<'idle'|'loading'|'sent'|'error'>('idle')
+  const [password, setPassword] = useState('')
+  const [confirm, setConfirm] = useState('')
+  const [mode, setMode] = useState<Mode>('signin')
   const [lang, setLang] = useState<Lang>('en')
+  const [status, setStatus] = useState<'idle'|'loading'|'sent'|'error'>('idle')
+  const [errorMsg, setErrorMsg] = useState('')
+  const [fieldErrors, setFieldErrors] = useState<{email?:string;password?:string;confirm?:string}>({})
 
   useEffect(() => {
     const saved = localStorage.getItem('ip_lang') as Lang | null
     if (saved && saved in T) setLang(saved)
+
+    // If already logged in, redirect to dashboard
+    const sb = createClient()
+    sb.auth.getSession().then(({ data }) => {
+      if (data.session) window.location.href = '/'
+    })
   }, [])
 
   const tr = T[lang]
   function switchLang(l: Lang) { setLang(l); localStorage.setItem('ip_lang', l) }
-  function validate(v: string) {
-    if (!v.trim()) return tr.errEmail
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) return tr.errInvalid
-    return ''
+
+  function validate(): boolean {
+    const errs: {email?:string;password?:string;confirm?:string} = {}
+    if (!email.trim()) errs.email = tr.errEmail
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) errs.email = tr.errInvalid
+    if (mode !== 'reset') {
+      if (!password || password.length < 8) errs.password = tr.errPassword
+      if (mode === 'signup' && password !== confirm) errs.confirm = tr.errConfirm
+    }
+    setFieldErrors(errs)
+    return Object.keys(errs).length === 0
   }
+
   async function submit(e: React.FormEvent) {
     e.preventDefault()
-    const err = validate(email); if (err) { setEmailError(err); return }
-    setEmailError(''); setStatus('loading')
+    if (!validate()) return
+    setErrorMsg(''); setStatus('loading')
     const sb = createClient()
-    const { error } = await sb.auth.signInWithOtp({ email, options: { emailRedirectTo: `${window.location.origin}/auth/callback` } })
-    setStatus(error ? 'error' : 'sent')
+
+    if (mode === 'signin') {
+      const { error } = await sb.auth.signInWithPassword({ email, password })
+      if (error) {
+        setErrorMsg(tr.errWrong); setStatus('error')
+      } else {
+        window.location.href = '/'
+      }
+    } else if (mode === 'signup') {
+      const { error } = await sb.auth.signUp({
+        email, password,
+        options: { emailRedirectTo: `${window.location.origin}/auth/callback` }
+      })
+      if (error) {
+        const msg = error.message?.toLowerCase() || ''
+        setErrorMsg(msg.includes('already') ? tr.errUsed : tr.err)
+        setStatus('error')
+      } else {
+        setStatus('sent')
+      }
+    } else {
+      // reset
+      const { error } = await sb.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/auth/callback?next=/reset-password`
+      })
+      if (error) { setErrorMsg(tr.err); setStatus('error') }
+      else setStatus('sent')
+    }
   }
+
+  function switchMode(m: Mode) {
+    setMode(m); setStatus('idle'); setErrorMsg(''); setFieldErrors({})
+    setPassword(''); setConfirm('')
+  }
+
+  const sentTitle = mode === 'reset' ? tr.sentReset : tr.sentSignUp
+  const sentSub = mode === 'reset' ? tr.sentResetSub(email) : tr.sentSignUpSub(email)
 
   return (
     <>
@@ -346,7 +463,6 @@ export default function LoginB4() {
             bottom: (pos as any).bottom || undefined,
             left: (pos as any).left || undefined,
             right: (pos as any).right || undefined,
-            animationDelay: `${(pos as any).delay}s`,
             animation: `b4entrance 0.5s ${(pos as any).delay}s ease both, ${FLOAT_ANIMS[i]} ${(pos as any).dur}s ${(pos as any).delay + 0.5}s ease-in-out infinite`,
           }
           return (
@@ -361,17 +477,22 @@ export default function LoginB4() {
           )
         })}
 
-        {/* Center card with spinning ring */}
+        {/* Center card */}
         <div className="b4-center">
           <div style={{ position:'relative' }}>
             <div className="b4-ring" />
             <div className="b4-ring-inner" />
             <div className="b4-card">
+
               {status === 'sent' ? (
                 <div className="b4-sent">
                   <div className="b4-sent-icon">✉️</div>
-                  <h2 style={{ fontSize:22,fontWeight:700,color:'#F5F0E8',letterSpacing:'-0.4px',marginBottom:8 }}>{tr.sentTitle}</h2>
-                  <p style={{ fontSize:14,color:'rgba(255,255,255,0.4)',lineHeight:1.65 }}>{tr.sentSub(email)}</p>
+                  <div className="b4-sent-title">{sentTitle}</div>
+                  <p className="b4-sent-sub">{sentSub}</p>
+                  <button
+                    onClick={() => switchMode('signin')}
+                    style={{ marginTop:20, background:'none', border:'none', cursor:'pointer', color:'rgba(245,158,11,0.7)', fontSize:13, fontWeight:600 }}
+                  >{tr.backToSignIn}</button>
                 </div>
               ) : (
                 <>
@@ -380,55 +501,125 @@ export default function LoginB4() {
                     {tr.badge}
                   </div>
 
-                  <h1 className="b4-title">{tr.title}</h1>
-                  <p className="b4-sub">{tr.sub}</p>
+                  {mode !== 'reset' ? (
+                    <>
+                      <h1 className="b4-title">{tr.title}</h1>
+                      <p className="b4-sub">{tr.sub}</p>
+
+                      {/* Sign In / Sign Up tabs */}
+                      <div className="b4-tabs">
+                        <button className={`b4-tab${mode==='signin'?' on':''}`} onClick={()=>switchMode('signin')}>{tr.tabSignIn}</button>
+                        <button className={`b4-tab${mode==='signup'?' on':''}`} onClick={()=>switchMode('signup')}>{tr.tabSignUp}</button>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <h1 className="b4-title">{tr.resetTitle}</h1>
+                      <p className="b4-sub">{tr.resetSub}</p>
+                    </>
+                  )}
 
                   <form onSubmit={submit} noValidate>
-                    <label style={{ fontSize:11,fontWeight:700,color:'rgba(255,255,255,0.32)',display:'block',marginBottom:8,letterSpacing:'0.5px',textTransform:'uppercase' }}>
-                      {tr.label}
-                    </label>
-                    <input
-                      type="email" className={`b4-input${emailError?' err':''}`}
-                      placeholder={tr.placeholder} value={email}
-                      onChange={e=>{setEmail(e.target.value);if(emailError)setEmailError('')}}
-                      onBlur={()=>{if(email)setEmailError(validate(email))}}
-                      disabled={status==='loading'} autoComplete="email"
-                      style={{ marginBottom: emailError ? 6 : 14 }}
-                    />
-                    {emailError && <div style={{ color:'#FF4D6B',fontSize:12,marginBottom:10,display:'flex',alignItems:'center',gap:4 }}><span>⚠</span>{emailError}</div>}
+                    {/* Email */}
+                    <div className="b4-field">
+                      <label className="b4-label">{tr.labelEmail}</label>
+                      <input
+                        type="email"
+                        className={`b4-input${fieldErrors.email?' err':''}`}
+                        placeholder={tr.placeholderEmail}
+                        value={email}
+                        onChange={e => { setEmail(e.target.value); setFieldErrors(f=>({...f,email:''})) }}
+                        disabled={status==='loading'}
+                        autoComplete="email"
+                      />
+                      {fieldErrors.email && <div className="b4-err-msg"><span>⚠</span>{fieldErrors.email}</div>}
+                    </div>
+
+                    {/* Password */}
+                    {mode !== 'reset' && (
+                      <div className="b4-field">
+                        <label className="b4-label">{tr.labelPassword}</label>
+                        <input
+                          type="password"
+                          className={`b4-input${fieldErrors.password?' err':''}`}
+                          placeholder={tr.placeholderPassword}
+                          value={password}
+                          onChange={e => { setPassword(e.target.value); setFieldErrors(f=>({...f,password:''})) }}
+                          disabled={status==='loading'}
+                          autoComplete={mode==='signin'?'current-password':'new-password'}
+                        />
+                        {fieldErrors.password && <div className="b4-err-msg"><span>⚠</span>{fieldErrors.password}</div>}
+                      </div>
+                    )}
+
+                    {/* Confirm password — signup only */}
+                    {mode === 'signup' && (
+                      <div className="b4-field">
+                        <label className="b4-label">{tr.labelConfirm}</label>
+                        <input
+                          type="password"
+                          className={`b4-input${fieldErrors.confirm?' err':''}`}
+                          placeholder={tr.placeholderPassword}
+                          value={confirm}
+                          onChange={e => { setConfirm(e.target.value); setFieldErrors(f=>({...f,confirm:''})) }}
+                          disabled={status==='loading'}
+                          autoComplete="new-password"
+                        />
+                        {fieldErrors.confirm && <div className="b4-err-msg"><span>⚠</span>{fieldErrors.confirm}</div>}
+                      </div>
+                    )}
+
+                    {/* Forgot password link */}
+                    {mode === 'signin' && (
+                      <div className="b4-forgot">
+                        <button type="button" onClick={() => switchMode('reset')}>{tr.forgotPassword}</button>
+                      </div>
+                    )}
+
                     <button className="b4-btn" type="submit" disabled={status==='loading'}>
                       {status==='loading'
                         ? <span style={{ display:'flex',alignItems:'center',justifyContent:'center',gap:8 }}>
                             <span style={{ width:15,height:15,border:'2px solid rgba(26,13,0,0.3)',borderTopColor:'#1A0D00',borderRadius:'50%',display:'inline-block',animation:'spin 0.7s linear infinite' }}/>
                             {tr.submitting}
                           </span>
-                        : tr.submit}
+                        : mode==='signin' ? tr.submitSignIn : mode==='signup' ? tr.submitSignUp : tr.submitReset}
                     </button>
-                    {status==='error' && <div style={{ marginTop:12,padding:'10px 14px',background:'rgba(255,77,107,0.08)',border:'1px solid rgba(255,77,107,0.2)',borderRadius:10,fontSize:13,color:'#FF4D6B',textAlign:'center' }}>{tr.err}</div>}
-                    <p style={{ fontSize:12,color:'rgba(255,255,255,0.2)',textAlign:'center',marginTop:12 }}>{tr.hint}</p>
+
+                    {status==='error' && (
+                      <div style={{ marginTop:12,padding:'10px 14px',background:'rgba(255,77,107,0.08)',border:'1px solid rgba(255,77,107,0.2)',borderRadius:10,fontSize:13,color:'#FF4D6B',textAlign:'center' }}>
+                        {errorMsg}
+                      </div>
+                    )}
+
+                    {mode === 'reset' && (
+                      <button type="button" onClick={() => switchMode('signin')}
+                        style={{ display:'block',width:'100%',marginTop:14,background:'none',border:'none',cursor:'pointer',fontSize:13,color:'rgba(255,255,255,0.3)',textAlign:'center' }}>
+                        {tr.backToSignIn}
+                      </button>
+                    )}
+
+                    <div className="b4-hint">
+                      <span className="b4-hint-icon">🔒</span>
+                      {tr.hint}
+                    </div>
                   </form>
 
-                  <div className="b4-stats">
-                    {[['$2.4M','Recovered'],['94%','Response'],['8 sec','To write']].map(([v,l],i)=>(
-                      <div key={i} className="b4-stat">
-                        <div className="b4-stat-v">{v}</div>
-                        <div className="b4-stat-l">{l}</div>
-                      </div>
-                    ))}
-                  </div>
+                  {mode !== 'reset' && (
+                    <div className="b4-stats">
+                      {[['$2.4M','Recovered'],['94%','Response'],['8 sec','To write']].map(([v,l],i)=>(
+                        <div key={i} className="b4-stat">
+                          <div className="b4-stat-v">{v}</div>
+                          <div className="b4-stat-l">{l}</div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </>
               )}
+
             </div>
           </div>
         </div>
-      </div>
-
-      <div className="b4-vnav">
-        <span>{tr.variantLabel}</span>
-        <a href="/login-b" className="b4-vlink">B</a>
-        <a href="/login-b2" className="b4-vlink">B2 — Split</a>
-        <a href="/login-b3" className="b4-vlink">B3 — Diagonal</a>
-        <a href="/login-b4" className="b4-vlink on">B4 — Orbit</a>
       </div>
     </>
   )

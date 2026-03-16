@@ -253,9 +253,12 @@ export default function Home() {
     const saved = localStorage.getItem('ip_lang') as Lang | null
     if (saved && saved in translations) setLang(saved)
     supabase.auth.getUser().then(({ data }) => {
-      setUser(data.user)
-      if (data.user) fetchInvoices(data.user.id)
-      else setLoading(false)
+      if (data.user) {
+        setUser(data.user)
+        fetchInvoices(data.user.id)
+      } else {
+        window.location.href = '/login'
+      }
     })
   }, [])
 
