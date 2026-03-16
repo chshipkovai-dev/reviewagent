@@ -221,8 +221,8 @@ const EMPTY_ERRORS = { client_name: '', amount: '', days_overdue: '' }
 const overdueColor = (days: number) =>
   days >= 60 ? '#FF4D6B' : days >= 30 ? 'var(--warning)' : '#60A5FA'
 
-const emailColors = ['#60A5FA', 'var(--warning)', '#FF4D6B']
-const emailBorders = ['rgba(96,165,250,0.25)', 'rgba(245,158,11,0.25)', 'rgba(255,77,107,0.25)']
+const emailColors = ['#60A5FA', '#FB923C', '#FF4D6B']
+const emailBorders = ['rgba(96,165,250,0.2)', 'rgba(251,146,60,0.2)', 'rgba(255,77,107,0.2)']
 
 export default function Home() {
   const [user, setUser] = useState<User | null>(null)
@@ -365,7 +365,7 @@ export default function Home() {
           <div className="animate-fade-up" style={{ textAlign: 'center', maxWidth: 400 }}>
             <div style={{
               display: 'inline-flex', width: 56, height: 56, borderRadius: 14,
-              background: 'linear-gradient(135deg, #6366F1, #818CF8)',
+              background: 'linear-gradient(135deg, #D97706, #F59E0B)',
               alignItems: 'center', justifyContent: 'center', fontSize: 24, marginBottom: 24,
             }}>✈</div>
             <h1 style={{ fontSize: 32, fontWeight: 800, letterSpacing: '-0.6px', marginBottom: 12, whiteSpace: 'pre-line', lineHeight: 1.15 }}>
@@ -402,7 +402,7 @@ export default function Home() {
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 3 }}>
             <div style={{
               width: 30, height: 30, borderRadius: 8,
-              background: 'linear-gradient(135deg, #6366F1, #818CF8)',
+              background: 'linear-gradient(135deg, #D97706, #F59E0B)',
               display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15,
             }}>✈</div>
             <h1 style={{ fontSize: 20, fontWeight: 700, letterSpacing: '-0.3px' }}>{tr.appName}</h1>
