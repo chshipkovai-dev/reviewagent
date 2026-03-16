@@ -5,24 +5,36 @@ const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 
 export async function POST(req: Request) {
   try {
-    const { client_name, amount, days_overdue, description } = await req.json()
+    const { business_name, business_type, tone, reviews } = await req.json()
 
-    const prompt = `You are helping a freelancer follow up on an overdue invoice.
+    if (!reviews || reviews.length === 0) {
+      return NextResponse.json({ error: 'No reviews provided' }, { status: 400 })
+    }
 
-Invoice details:
-- Client: ${client_name}
-- Amount: $${amount}
-- Days overdue: ${days_overdue}
-- Project: ${description || 'freelance project'}
+    const toneDesc =
+      tone === 'friendly' ? 'warm, personal, and appreciative' :
+      tone === 'professional' ? 'professional, polished, and courteous' :
+      'formal, concise, and respectful'
 
-Write exactly 3 follow-up email versions. Each must be complete and ready to send.
+    const reviewList = reviews
+      .map((r: string, i: number) => `Review ${i + 1}: ${r}`)
+      .join('\n\n')
 
-Version 1 — Friendly: warm, assume it slipped through, no pressure
-Version 2 — Firm: professional, direct, clear urgency
-Version 3 — Final Notice: serious tone, mention next steps if unpaid
+    const prompt = `You are helping ${business_name} (a ${business_type}) respond to Google reviews.
+
+Tone: ${toneDesc}
+
+Write a response for EACH review below. Responses should:
+- Be 2-4 sentences
+- Sound human, not robotic
+- For positive reviews: thank the customer sincerely and invite them back
+- For negative reviews: apologize, acknowledge the issue, offer to resolve it
+- Never be generic — reference specific details from the review when possible
+
+${reviewList}
 
 Respond with ONLY valid JSON, no markdown:
-{"versions":["email1 full text","email2 full text","email3 full text"]}`
+{"responses":["response1","response2","response3"]}`
 
     const msg = await client.messages.create({
       model: 'claude-haiku-4-5-20251001',
@@ -32,9 +44,9 @@ Respond with ONLY valid JSON, no markdown:
 
     const raw = (msg.content[0] as { type: string; text: string }).text
     const cleaned = raw.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim()
-    const { versions } = JSON.parse(cleaned)
+    const { responses } = JSON.parse(cleaned)
 
-    return NextResponse.json({ versions })
+    return NextResponse.json({ responses })
   } catch (e: unknown) {
     const msg = e instanceof Error ? e.message : String(e)
     console.error('generate error:', msg)

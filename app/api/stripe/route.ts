@@ -3,9 +3,10 @@ import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
+export const dynamic = 'force-dynamic'
 
 export async function POST() {
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
   const cookieStore = await cookies()
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -33,10 +34,10 @@ export async function POST() {
         currency: 'usd',
         recurring: { interval: 'month' },
         product_data: {
-          name: 'InvoicePilot Pro',
-          description: 'Unlimited invoice follow-ups with AI',
+          name: 'ReviewAgent Pro',
+          description: 'Unlimited AI responses to Google reviews',
         },
-        unit_amount: 3900, // $39.00
+        unit_amount: 4900, // $49.00
       },
       quantity: 1,
     }],
