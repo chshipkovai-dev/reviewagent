@@ -482,6 +482,32 @@ function Landing() {
           </div>
         </section>
 
+        {/* FAQ */}
+        <section className="ld-section" id="faq" style={{ paddingTop:0 }}>
+          <div style={{ textAlign:'center', marginBottom:48 }}>
+            <div className="ld-section-label" style={{ justifyContent:'center', display:'flex' }}>FAQ</div>
+            <h2 className="ld-section-title" style={{ textAlign:'center' }}>Common questions.</h2>
+          </div>
+          <div style={{ maxWidth:640, margin:'0 auto', display:'flex', flexDirection:'column', gap:12 }}>
+            {[
+              { q: 'Do I need to connect my Google account?', a: 'No. You paste your reviews into ReviewAgent, get the AI-written replies, and copy them to Google yourself. No API keys, no integrations needed.' },
+              { q: 'What kind of businesses does this work for?', a: 'Any local business with Google reviews — restaurants, cafes, salons, barbershops, fitness studios, dental clinics, and more.' },
+              { q: 'How does the 7-day free trial work?', a: 'You get full access for 7 days with no charge. Enter your card at signup — if you cancel before the trial ends, you pay nothing.' },
+              { q: 'Can I cancel anytime?', a: 'Yes. Cancel from your account settings at any time. No questions, no cancellation fees.' },
+              { q: 'Are my reviews stored or shared?', a: 'No. Reviews you paste are processed in real time to generate replies and are not stored on our servers.' },
+              { q: 'What if I don\'t like the generated reply?', a: 'You always review the reply before posting it. Edit it, regenerate, or ignore it — you\'re always in control.' },
+            ].map(({ q, a }) => (
+              <details key={q} style={{ background:'var(--elevated)', border:'1px solid var(--border)', borderRadius:12, padding:'16px 20px', cursor:'pointer' }}>
+                <summary style={{ fontWeight:600, fontSize:14, color:'var(--text)', listStyle:'none', display:'flex', justifyContent:'space-between', alignItems:'center', gap:12 }}>
+                  {q}
+                  <span style={{ color:'var(--muted)', fontSize:18, flexShrink:0 }}>+</span>
+                </summary>
+                <p style={{ marginTop:12, fontSize:13.5, color:'var(--muted)', lineHeight:1.6 }}>{a}</p>
+              </details>
+            ))}
+          </div>
+        </section>
+
         {/* CTA BANNER */}
         <div className="ld-cta-banner">
           <h2 className="ld-cta-title">Stop leaving reviews<br/><span>unanswered.</span></h2>
@@ -501,6 +527,9 @@ function Landing() {
           <div className="ld-footer-links">
             <a href="/login" className="ld-footer-link">Sign in</a>
             <a href="#pricing" className="ld-footer-link">Pricing</a>
+            <a href="#faq" className="ld-footer-link">FAQ</a>
+            <a href="/privacy" className="ld-footer-link">Privacy</a>
+            <a href="/terms" className="ld-footer-link">Terms</a>
           </div>
         </footer>
 
@@ -508,6 +537,115 @@ function Landing() {
     </>
   )
 }
+
+// ── APP CSS ──────────────────────────────────────────────
+const APP_CSS = `
+.ra-app{min-height:100vh;background:var(--bg);display:flex;flex-direction:column;}
+
+/* HEADER */
+.ra-hdr{position:sticky;top:0;z-index:100;height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;background:rgba(5,12,8,0.92);backdrop-filter:blur(16px);border-bottom:1px solid rgba(16,185,129,0.07);flex-shrink:0;}
+.ra-hdr-logo{display:flex;align-items:center;gap:9px;}
+.ra-hdr-logo-icon{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,#059669,#10B981);display:flex;align-items:center;justify-content:center;font-size:14px;box-shadow:0 2px 10px rgba(16,185,129,0.2);}
+.ra-hdr-logo-name{font-size:15px;font-weight:700;letter-spacing:-0.3px;}
+.ra-hdr-right{display:flex;align-items:center;gap:8px;}
+.ra-hdr-stat{display:flex;align-items:center;gap:5px;padding:4px 10px;border-radius:7px;background:rgba(16,185,129,0.07);border:1px solid rgba(16,185,129,0.1);font-size:11.5px;color:var(--muted);}
+.ra-hdr-stat b{color:#10B981;font-weight:700;}
+.ra-upgrade{display:inline-flex;align-items:center;gap:5px;padding:6px 14px;border-radius:8px;background:linear-gradient(135deg,#059669,#10B981);color:#fff;font-size:12px;font-weight:700;text-decoration:none;box-shadow:0 2px 10px rgba(16,185,129,0.2);transition:all 0.2s;}
+.ra-upgrade:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(16,185,129,0.35);}
+.ra-signout{font-size:12px;padding:6px 12px;background:transparent;border:1px solid var(--border);border-radius:8px;color:var(--muted);cursor:pointer;transition:all 0.15s;}
+.ra-signout:hover{color:var(--text);border-color:var(--border-hover);}
+
+/* BODY */
+.ra-body{display:grid;grid-template-columns:240px 1fr;flex:1;max-width:1060px;width:100%;margin:0 auto;padding:0 24px;}
+
+/* SIDEBAR */
+.ra-side{padding:24px 20px 40px 0;border-right:1px solid rgba(16,185,129,0.06);}
+.ra-side-label{font-size:10px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--dim);margin-bottom:12px;}
+.ra-side-field{margin-bottom:10px;}
+.ra-side-field-lbl{font-size:11.5px;color:var(--muted);margin-bottom:5px;display:block;}
+.ra-side-input{width:100%;padding:8px 11px;border-radius:8px;background:var(--elevated);border:1px solid var(--border);color:var(--text);font-size:13px;font-family:inherit;outline:none;transition:border-color 0.2s;box-sizing:border-box;}
+.ra-side-input:focus{border-color:rgba(16,185,129,0.35);}
+.ra-side-select{width:100%;padding:8px 11px;border-radius:8px;background:var(--elevated);border:1px solid var(--border);color:var(--text);font-size:13px;font-family:inherit;cursor:pointer;outline:none;box-sizing:border-box;}
+.ra-saved{font-size:11px;color:#10B981;height:16px;margin-top:6px;opacity:0;transition:opacity 0.3s;}
+.ra-saved.show{opacity:1;}
+.ra-side-div{height:1px;background:rgba(16,185,129,0.06);margin:18px 0;}
+.ra-tone-list{display:flex;flex-direction:column;gap:5px;}
+.ra-tone-opt{display:flex;align-items:center;gap:9px;padding:9px 12px;border-radius:9px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;font-family:inherit;text-align:left;transition:all 0.15s;width:100%;}
+.ra-tone-opt:hover{background:var(--elevated);color:var(--text);}
+.ra-tone-opt.active{background:rgba(16,185,129,0.08);border-color:rgba(16,185,129,0.28);color:#10B981;}
+.ra-tone-icon{font-size:15px;flex-shrink:0;width:20px;}
+.ra-tone-name{font-weight:600;font-size:12.5px;}
+.ra-tone-desc{font-size:10.5px;opacity:0.6;margin-top:1px;}
+.ra-stats-list{display:flex;flex-direction:column;gap:7px;}
+.ra-stat-row{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--muted);}
+.ra-stat-val{font-weight:700;color:#10B981;font-size:13px;}
+
+/* MAIN */
+.ra-main{padding:24px 0 80px 24px;}
+.ra-workspace{background:var(--surface);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:20px;}
+.ra-ws-head{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;background:var(--elevated);border-bottom:1px solid var(--border);}
+.ra-ws-title{font-size:13px;font-weight:700;display:flex;align-items:center;gap:7px;color:var(--text);}
+.ra-ws-dot{width:5px;height:5px;border-radius:50%;background:#10B981;flex-shrink:0;}
+.ra-add-btn{display:flex;align-items:center;gap:5px;padding:5px 12px;border-radius:7px;background:transparent;border:1px solid var(--border);color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;transition:all 0.15s;}
+.ra-add-btn:hover{color:var(--text);border-color:var(--border-hover);}
+.ra-reviews-list{padding:14px 18px;display:flex;flex-direction:column;gap:10px;}
+.ra-rev-row{display:grid;grid-template-columns:24px 1fr 24px;gap:8px;align-items:flex-start;padding-top:2px;}
+.ra-rev-num{width:24px;height:24px;border-radius:7px;background:rgba(16,185,129,0.07);border:1px solid rgba(16,185,129,0.12);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:rgba(16,185,129,0.55);margin-top:10px;flex-shrink:0;}
+.ra-rev-ta{width:100%;min-height:76px;resize:none;padding:10px 12px;border-radius:10px;background:var(--elevated);border:1px solid var(--border);color:var(--text);font-size:13px;font-family:inherit;line-height:1.6;outline:none;transition:border-color 0.2s, border-left-color 0.2s;box-sizing:border-box;}
+.ra-rev-ta:focus{border-color:rgba(16,185,129,0.25);border-left-color:#10B981;}
+.ra-rev-ta::placeholder{color:var(--dim);}
+.ra-rev-rm{width:24px;height:24px;border-radius:6px;background:transparent;border:none;color:var(--dim);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;margin-top:10px;transition:all 0.15s;padding:0;line-height:1;}
+.ra-rev-rm:hover{background:rgba(255,77,107,0.1);color:#FF4D6B;}
+.ra-ws-foot{padding:14px 18px;border-top:1px solid var(--border);}
+.ra-gen-btn{width:100%;height:50px;border-radius:10px;border:none;background:linear-gradient(135deg,#059669 0%,#10B981 50%,#34D399 100%);color:#fff;font-size:15px;font-weight:700;cursor:pointer;transition:all 0.2s;box-shadow:0 4px 20px rgba(16,185,129,0.25);position:relative;overflow:hidden;}
+.ra-gen-btn::after{content:'';position:absolute;top:0;left:-100%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.15),transparent);animation:raShimmer 3s 0.5s ease-in-out infinite;}
+@keyframes raShimmer{0%{left:-100%}50%,100%{left:150%}}
+.ra-gen-btn:hover{transform:translateY(-1px);box-shadow:0 6px 28px rgba(16,185,129,0.38);}
+.ra-gen-btn:active{transform:none;}
+.ra-gen-btn:disabled{background:var(--elevated);color:var(--muted);cursor:default;transform:none;box-shadow:none;}
+.ra-gen-btn:disabled::after{display:none;}
+.ra-error{font-size:12px;color:var(--danger);margin-top:10px;display:flex;align-items:center;gap:5px;}
+
+/* RESPONSES */
+.ra-resp-head{font-size:10.5px;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;display:flex;align-items:center;gap:10px;}
+.ra-resp-head::after{content:'';flex:1;height:1px;background:var(--border);}
+.ra-resp-cards{display:flex;flex-direction:column;gap:14px;}
+.ra-resp-card{background:var(--surface);border:1px solid var(--border);border-left:3px solid #10B981;border-radius:14px;overflow:hidden;animation:raFadeUp 0.4s cubic-bezier(0.16,1,0.3,1) both;}
+@keyframes raFadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.ra-resp-src{padding:10px 16px;background:rgba(16,185,129,0.03);border-bottom:1px solid rgba(16,185,129,0.07);}
+.ra-resp-src-lbl{font-size:9.5px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;color:rgba(16,185,129,0.45);margin-bottom:4px;}
+.ra-resp-src-txt{font-size:12px;color:var(--muted);line-height:1.5;font-style:italic;}
+.ra-resp-body{padding:16px;}
+.ra-resp-txt{font-size:13.5px;color:var(--text);line-height:1.75;white-space:pre-wrap;margin-bottom:14px;}
+.ra-resp-foot{display:flex;align-items:center;justify-content:space-between;}
+.ra-copy-btn{display:flex;align-items:center;gap:6px;padding:7px 16px;border-radius:8px;font-size:12.5px;font-weight:700;cursor:pointer;transition:all 0.15s;border:1px solid var(--border);background:var(--elevated);color:var(--muted);}
+.ra-copy-btn:hover{color:var(--text);border-color:var(--border-hover);}
+.ra-copy-btn.done{background:rgba(16,185,129,0.1);border-color:rgba(16,185,129,0.25);color:#10B981;transform:scale(1.03);}
+.ra-replied-btn{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--dim);background:none;border:none;padding:0;cursor:pointer;transition:color 0.15s;}
+.ra-replied-btn:hover{color:var(--muted);}
+.ra-replied-btn.done{color:#10B981;}
+.ra-replied-box{width:16px;height:16px;border-radius:4px;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:9px;transition:all 0.15s;flex-shrink:0;}
+.ra-replied-btn.done .ra-replied-box{border-color:#10B981;background:rgba(16,185,129,0.15);color:#10B981;}
+
+/* EMPTY */
+.ra-empty{display:flex;flex-direction:column;align-items:center;padding:52px 24px;text-align:center;border:1px dashed var(--border);border-radius:14px;margin-top:4px;}
+.ra-empty-icon{font-size:32px;margin-bottom:14px;opacity:0.4;}
+.ra-empty-title{font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px;}
+.ra-empty-sub{font-size:13px;color:var(--muted);line-height:1.6;max-width:280px;}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+  .ra-body{grid-template-columns:1fr;padding:0 14px;}
+  .ra-side{padding:16px 0;border-right:none;border-bottom:1px solid rgba(16,185,129,0.06);}
+  .ra-main{padding:16px 0 60px;}
+  .ra-hdr-stat{display:none;}
+  .ra-tone-list{flex-direction:row;flex-wrap:wrap;}
+  .ra-tone-opt{flex:1;min-width:0;}
+  .ra-tone-desc{display:none;}
+}
+`
+
+const GEN_STEPS = ['Reading your reviews…', 'Writing responses…', 'Almost done…']
 
 // ── MAIN EXPORT ──────────────────────────────────────────
 export default function Home() {
@@ -519,10 +657,15 @@ export default function Home() {
   const [tone, setTone] = useState<Tone>('professional')
   const [reviews, setReviews] = useState<string[]>([''])
   const [responses, setResponses] = useState<string[]>([])
+  const [lastReviews, setLastReviews] = useState<string[]>([])
   const [generating, setGenerating] = useState(false)
+  const [genStep, setGenStep] = useState(GEN_STEPS[0])
   const [copied, setCopied] = useState<number | null>(null)
+  const [replied, setReplied] = useState<Set<number>>(new Set())
   const [toast, setToast] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [totalResponses, setTotalResponses] = useState(0)
+  const [savedFlash, setSavedFlash] = useState(false)
 
   const supabase = createClient()
 
@@ -542,25 +685,36 @@ export default function Home() {
           if (s.businessType) setBusinessType(s.businessType)
           if (s.tone) setTone(s.tone)
         }
+        const stats = JSON.parse(localStorage.getItem('ra_stats') || '{"total":0}')
+        setTotalResponses(stats.total || 0)
       }
       setLoading(false)
     })
   }, [])
 
-  function saveSettings() {
-    localStorage.setItem('ra_settings', JSON.stringify({ businessName, businessType, tone }))
-    showToast('✓ Settings saved')
+  function autoSave(name: string, type: string, t: Tone) {
+    localStorage.setItem('ra_settings', JSON.stringify({ businessName: name, businessType: type, tone: t }))
+    setSavedFlash(true)
+    setTimeout(() => setSavedFlash(false), 1400)
   }
 
-  function addReview() { setReviews(prev => [...prev, '']); setResponses([]) }
-  function removeReview(i: number) { setReviews(prev => prev.filter((_, idx) => idx !== i)); setResponses([]) }
-  function updateReview(i: number, val: string) { setReviews(prev => prev.map((r, idx) => idx === i ? val : r)); setResponses([]) }
+  function addReview() { setReviews(prev => [...prev, '']); setResponses([]); setLastReviews([]) }
+  function removeReview(i: number) { setReviews(prev => prev.filter((_, idx) => idx !== i)); setResponses([]); setLastReviews([]) }
+  function updateReview(i: number, val: string) { setReviews(prev => prev.map((r, idx) => idx === i ? val : r)); setResponses([]); setLastReviews([]) }
 
   async function generate() {
     const filled = reviews.filter(r => r.trim())
     if (!businessName.trim()) { setError('Enter your business name first'); return }
     if (filled.length === 0) { setError('Paste at least one review'); return }
-    setError(null); setGenerating(true); setResponses([])
+    setError(null); setGenerating(true); setResponses([]); setLastReviews([]); setReplied(new Set())
+
+    let stepIdx = 0
+    setGenStep(GEN_STEPS[0])
+    const stepTimer = setInterval(() => {
+      stepIdx = (stepIdx + 1) % GEN_STEPS.length
+      setGenStep(GEN_STEPS[stepIdx])
+    }, 2200)
+
     try {
       const res = await fetch('/api/generate', {
         method: 'POST',
@@ -570,9 +724,15 @@ export default function Home() {
       const data = await res.json()
       if (data.error) throw new Error(data.error)
       setResponses(data.responses)
+      setLastReviews(filled)
+      const stats = JSON.parse(localStorage.getItem('ra_stats') || '{"total":0}')
+      const newTotal = (stats.total || 0) + data.responses.length
+      localStorage.setItem('ra_stats', JSON.stringify({ total: newTotal }))
+      setTotalResponses(newTotal)
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Something went wrong')
     } finally {
+      clearInterval(stepTimer)
       setGenerating(false)
     }
   }
@@ -583,7 +743,14 @@ export default function Home() {
     showToast('✓ Copied to clipboard')
   }
 
-  // Loading
+  function toggleReplied(i: number) {
+    setReplied(prev => {
+      const next = new Set(prev)
+      next.has(i) ? next.delete(i) : next.add(i)
+      return next
+    })
+  }
+
   if (loading) {
     return (
       <div style={{ minHeight:'100vh', display:'flex', alignItems:'center', justifyContent:'center', background:'#050C08' }}>
@@ -593,132 +760,207 @@ export default function Home() {
     )
   }
 
-  // Landing (not logged in)
   if (!user) return <Landing />
 
-  // ── APP (logged in) ──────────────────────────────────────
+  // ── APP ──────────────────────────────────────────────────
   const filledReviews = reviews.filter(r => r.trim())
 
   return (
-    <div style={{ maxWidth:720, margin:'0 auto', padding:'32px 20px 80px', background:'var(--bg)', minHeight:'100vh' }}>
+    <>
+      <style dangerouslySetInnerHTML={{ __html: APP_CSS }} />
+      <div className="ra-app">
 
-      {/* Header */}
-      <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:32 }}>
-        <div style={{ display:'flex', alignItems:'center', gap:10 }}>
-          <div style={{ width:32, height:32, borderRadius:9, background:'linear-gradient(135deg,#10B981,#059669)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:17 }}>⭐</div>
-          <div>
-            <div style={{ fontWeight:700, fontSize:17, letterSpacing:'-0.3px' }}>ReviewAgent</div>
-            <div style={{ fontSize:11, color:'var(--muted)' }}>AI replies to your Google reviews</div>
+        {/* HEADER */}
+        <header className="ra-hdr">
+          <div className="ra-hdr-logo">
+            <div className="ra-hdr-logo-icon">⭐</div>
+            <span className="ra-hdr-logo-name">ReviewAgent</span>
           </div>
-        </div>
-        <button
-          onClick={async () => { await supabase.auth.signOut(); window.location.href = '/login' }}
-          style={{ fontSize:13, padding:'7px 14px', background:'transparent', border:'1px solid var(--border)', borderRadius:8, color:'var(--muted)', cursor:'pointer' }}
-        >
-          Sign out
-        </button>
-      </div>
+          <div className="ra-hdr-right">
+            {totalResponses > 0 && (
+              <div className="ra-hdr-stat"><b>{totalResponses}</b> responses generated</div>
+            )}
+            <a href="/upgrade" className="ra-upgrade">⚡ Upgrade</a>
+            <button className="ra-signout" onClick={async () => { await supabase.auth.signOut(); window.location.href = '/login' }}>
+              Sign out
+            </button>
+          </div>
+        </header>
 
-      {/* Business Settings */}
-      <div className="card" style={{ marginBottom:20 }}>
-        <div style={{ fontSize:13, fontWeight:600, marginBottom:16 }}>Your Business</div>
-        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12, marginBottom:12 }}>
-          <div>
-            <label style={{ fontSize:12, color:'var(--muted)', display:'block', marginBottom:6 }}>Business name</label>
-            <input value={businessName} onChange={e => setBusinessName(e.target.value)} placeholder="Mario's Pizza" style={{ width:'100%', boxSizing:'border-box' }} />
-          </div>
-          <div>
-            <label style={{ fontSize:12, color:'var(--muted)', display:'block', marginBottom:6 }}>Business type</label>
-            <select value={businessType} onChange={e => setBusinessType(e.target.value)}
-              style={{ width:'100%', padding:'9px 12px', background:'var(--surface)', border:'1px solid var(--border)', borderRadius:8, fontSize:13, color:'var(--text)', cursor:'pointer', boxSizing:'border-box' }}>
-              {BUSINESS_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
-            </select>
-          </div>
-        </div>
-        <div style={{ marginBottom:16 }}>
-          <label style={{ fontSize:12, color:'var(--muted)', display:'block', marginBottom:8 }}>Response tone</label>
-          <div style={{ display:'flex', gap:8 }}>
-            {(Object.keys(TONE_LABELS) as Tone[]).map(t => (
-              <button key={t} onClick={() => setTone(t)} style={{
-                padding:'7px 14px', borderRadius:8, fontSize:13, cursor:'pointer',
-                border: tone===t ? '1px solid #10B981' : '1px solid var(--border)',
-                background: tone===t ? 'rgba(16,185,129,0.1)' : 'transparent',
-                color: tone===t ? '#10B981' : 'var(--muted)',
-                fontWeight: tone===t ? 600 : 400,
-              }}>{TONE_LABELS[t]}</button>
-            ))}
-          </div>
-        </div>
-        <button onClick={saveSettings}
-          style={{ fontSize:12, padding:'7px 16px', background:'transparent', border:'1px solid var(--border)', borderRadius:8, color:'var(--muted)', cursor:'pointer' }}>
-          Save settings
-        </button>
-      </div>
+        {/* BODY */}
+        <div className="ra-body">
 
-      {/* Reviews Input */}
-      <div className="card" style={{ marginBottom:16 }}>
-        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:16 }}>
-          <div style={{ fontSize:13, fontWeight:600 }}>Paste your reviews ({reviews.length})</div>
-          <button onClick={addReview}
-            style={{ fontSize:12, padding:'6px 12px', background:'transparent', border:'1px solid var(--border)', borderRadius:7, color:'var(--muted)', cursor:'pointer' }}>
-            + Add review
-          </button>
-        </div>
-        <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
-          {reviews.map((review, i) => (
-            <div key={i} style={{ position:'relative' }}>
-              <textarea value={review} onChange={e => updateReview(i, e.target.value)}
-                placeholder={`Paste review #${i + 1} here...`} rows={3}
-                style={{ width:'100%', boxSizing:'border-box', resize:'vertical', padding:'10px 36px 10px 12px', fontSize:13, lineHeight:1.6, background:'var(--surface)', border:'1px solid var(--border)', borderRadius:8, color:'var(--text)', fontFamily:'inherit' }} />
-              {reviews.length > 1 && (
-                <button onClick={() => removeReview(i)}
-                  style={{ position:'absolute', top:8, right:8, width:22, height:22, background:'transparent', border:'none', color:'var(--muted)', cursor:'pointer', fontSize:16, lineHeight:1, borderRadius:4 }}>×</button>
-              )}
-            </div>
-          ))}
-        </div>
-        {error && <div style={{ color:'var(--danger)', fontSize:12, marginTop:10 }}>⚠ {error}</div>}
-        <button onClick={generate} disabled={generating} style={{
-          marginTop:16, width:'100%', padding:'13px',
-          background: generating ? 'var(--elevated)' : 'linear-gradient(135deg,#059669,#10B981)',
-          color: generating ? 'var(--muted)' : '#fff',
-          border:'none', borderRadius:10, fontSize:14, fontWeight:600,
-          cursor: generating ? 'default' : 'pointer', transition:'all 0.2s',
-          boxShadow: generating ? 'none' : '0 4px 16px rgba(16,185,129,0.25)',
-        }}>
-          {generating ? '✍️ Writing responses...' : `✨ Generate ${filledReviews.length > 0 ? filledReviews.length : ''} response${filledReviews.length !== 1 ? 's' : ''}`}
-        </button>
-      </div>
-
-      {/* Responses */}
-      {responses.length > 0 && (
-        <div style={{ display:'flex', flexDirection:'column', gap:12 }}>
-          {responses.map((response, i) => (
-            <div key={i} className="card" style={{ borderLeft:'3px solid #10B981' }}>
-              <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:12 }}>
-                <span style={{ fontSize:12, fontWeight:600, color:'#10B981' }}>Response to review #{i + 1}</span>
-                <button onClick={() => copyResponse(response, i)} style={{
-                  fontSize:12, padding:'5px 12px',
-                  background: copied===i ? 'rgba(16,185,129,0.1)' : 'var(--elevated)',
-                  border: `1px solid ${copied===i ? '#10B981' : 'var(--border)'}`,
-                  color: copied===i ? '#10B981' : 'var(--muted)',
-                  borderRadius:6, cursor:'pointer', fontWeight: copied===i ? 600 : 400,
-                }}>{copied===i ? '✓ Copied' : 'Copy'}</button>
+          {/* SIDEBAR */}
+          <aside className="ra-side">
+            <div style={{ marginBottom:24 }}>
+              <div className="ra-side-label">Your Business</div>
+              <div className="ra-side-field">
+                <label className="ra-side-field-lbl">Business name</label>
+                <input
+                  className="ra-side-input"
+                  value={businessName}
+                  onChange={e => setBusinessName(e.target.value)}
+                  onBlur={e => autoSave(e.target.value, businessType, tone)}
+                  placeholder="Mario's Pizza"
+                />
               </div>
-              <div style={{ fontSize:13, color:'var(--muted)', lineHeight:1.7, whiteSpace:'pre-wrap' }}>{response}</div>
+              <div className="ra-side-field">
+                <label className="ra-side-field-lbl">Business type</label>
+                <select
+                  className="ra-side-select"
+                  value={businessType}
+                  onChange={e => { setBusinessType(e.target.value); autoSave(businessName, e.target.value, tone) }}
+                >
+                  {BUSINESS_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+                </select>
+              </div>
+              <div className={`ra-saved ${savedFlash ? 'show' : ''}`}>✓ Saved</div>
             </div>
-          ))}
-        </div>
-      )}
 
-      {toast && (
-        <div className="toast">
-          <span style={{ color:'var(--success)', fontSize:15 }}>✓</span>
-          <span>{toast.replace('✓ ', '')}</span>
-        </div>
-      )}
+            <div className="ra-side-div" />
 
+            <div style={{ marginBottom:24 }}>
+              <div className="ra-side-label">Response Tone</div>
+              <div className="ra-tone-list">
+                {[
+                  { key:'friendly',     icon:'😊', name:'Friendly',     desc:'Warm and personal' },
+                  { key:'professional', icon:'💼', name:'Professional', desc:'Confident and clear' },
+                  { key:'formal',       icon:'🎩', name:'Formal',       desc:'Reserved and polished' },
+                ].map(({ key, icon, name, desc }) => (
+                  <button
+                    key={key}
+                    className={`ra-tone-opt ${tone === key ? 'active' : ''}`}
+                    onClick={() => { setTone(key as Tone); autoSave(businessName, businessType, key as Tone) }}
+                  >
+                    <span className="ra-tone-icon">{icon}</span>
+                    <div style={{ flex:1 }}>
+                      <div className="ra-tone-name">{name}</div>
+                      <div className="ra-tone-desc">{desc}</div>
+                    </div>
+                    {tone === key && <span style={{ fontSize:10, color:'#10B981', flexShrink:0 }}>✓</span>}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {totalResponses > 0 && (
+              <>
+                <div className="ra-side-div" />
+                <div>
+                  <div className="ra-side-label">Stats</div>
+                  <div className="ra-stats-list">
+                    <div className="ra-stat-row">
+                      <span>Total responses</span>
+                      <span className="ra-stat-val">{totalResponses}</span>
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
+          </aside>
+
+          {/* MAIN */}
+          <main className="ra-main">
+
+            {/* WORKSPACE */}
+            <div className="ra-workspace">
+              <div className="ra-ws-head">
+                <div className="ra-ws-title">
+                  <div className="ra-ws-dot" />
+                  Paste your reviews
+                  <span style={{ fontWeight:400, color:'var(--muted)', fontSize:12 }}>({reviews.length})</span>
+                </div>
+                <button className="ra-add-btn" onClick={addReview} disabled={reviews.length >= 10}>
+                  + Add review
+                </button>
+              </div>
+
+              <div className="ra-reviews-list">
+                {reviews.map((review, i) => (
+                  <div key={i} className="ra-rev-row">
+                    <div className="ra-rev-num">{i + 1}</div>
+                    <textarea
+                      className="ra-rev-ta"
+                      value={review}
+                      onChange={e => updateReview(i, e.target.value)}
+                      placeholder={`Paste Google review #${i + 1} here…`}
+                      rows={3}
+                    />
+                    {reviews.length > 1
+                      ? <button className="ra-rev-rm" onClick={() => removeReview(i)}>×</button>
+                      : <div />
+                    }
+                  </div>
+                ))}
+              </div>
+
+              <div className="ra-ws-foot">
+                {error && <div className="ra-error">⚠ {error}</div>}
+                <button className="ra-gen-btn" onClick={generate} disabled={generating}>
+                  {generating
+                    ? genStep
+                    : `✨ Generate ${filledReviews.length > 0 ? filledReviews.length : ''} response${filledReviews.length !== 1 ? 's' : ''}`
+                  }
+                </button>
+              </div>
+            </div>
+
+            {/* RESPONSES */}
+            {responses.length > 0 ? (
+              <>
+                <div className="ra-resp-head">AI Responses · Ready to post</div>
+                <div className="ra-resp-cards">
+                  {responses.map((response, i) => (
+                    <div key={i} className="ra-resp-card" style={{ animationDelay:`${i * 0.09}s` }}>
+                      {lastReviews[i] && (
+                        <div className="ra-resp-src">
+                          <div className="ra-resp-src-lbl">↩ Responding to</div>
+                          <div className="ra-resp-src-txt">
+                            {lastReviews[i].length > 110 ? lastReviews[i].slice(0, 110) + '…' : lastReviews[i]}
+                          </div>
+                        </div>
+                      )}
+                      <div className="ra-resp-body">
+                        <div className="ra-resp-txt">{response}</div>
+                        <div className="ra-resp-foot">
+                          <button
+                            className={`ra-copy-btn ${copied === i ? 'done' : ''}`}
+                            onClick={() => copyResponse(response, i)}
+                          >
+                            {copied === i ? '✓ Copied!' : '⎘ Copy'}
+                          </button>
+                          <button
+                            className={`ra-replied-btn ${replied.has(i) ? 'done' : ''}`}
+                            onClick={() => toggleReplied(i)}
+                          >
+                            <div className="ra-replied-box">{replied.has(i) ? '✓' : ''}</div>
+                            {replied.has(i) ? 'Replied in Google' : 'Mark as replied'}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </>
+            ) : !generating && (
+              <div className="ra-empty">
+                <div className="ra-empty-icon">⭐</div>
+                <div className="ra-empty-title">Your AI responses appear here</div>
+                <div className="ra-empty-sub">Paste your Google reviews above, then click Generate to get ready-to-post replies in seconds.</div>
+              </div>
+            )}
+
+          </main>
+        </div>
+
+        {toast && (
+          <div className="toast">
+            <span style={{ color:'var(--success)', fontSize:15 }}>✓</span>
+            <span>{toast.replace('✓ ', '')}</span>
+          </div>
+        )}
+      </div>
       <style>{`@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}`}</style>
-    </div>
+    </>
   )
 }
