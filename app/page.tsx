@@ -302,7 +302,7 @@ function Landing() {
             </p>
             <div className="ld-hero-cta">
               <a href="/login" className="ld-btn-primary">
-                Start free today →
+                Start free 7-day trial →
               </a>
               <a href="#how-it-works" className="ld-btn-secondary">See how it works</a>
             </div>
@@ -474,7 +474,7 @@ function Landing() {
                   </li>
                 ))}
               </ul>
-              <a href="/login" className="ld-plan-cta">Get started — first month free →</a>
+              <a href="/login" className="ld-plan-cta">Start free 7-day trial →</a>
               <div className="ld-plan-guarantee">
                 <span>🔒</span> 30-day money-back guarantee · Powered by Stripe
               </div>
@@ -487,7 +487,7 @@ function Landing() {
           <h2 className="ld-cta-title">Stop leaving reviews<br/><span>unanswered.</span></h2>
           <p className="ld-cta-sub">Every unanswered review is a missed chance to win back a customer.</p>
           <div className="ld-cta-btns">
-            <a href="/login" className="ld-btn-primary">Start free today →</a>
+            <a href="/login" className="ld-btn-primary">Start free 7-day trial →</a>
           </div>
         </div>
 
