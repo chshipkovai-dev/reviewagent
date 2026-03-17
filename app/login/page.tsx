@@ -194,8 +194,9 @@ const CSS = `
 /* ══ RIGHT PANEL ══════════════════════════════════════════ */
 .ra-right{
   width:45%;
-  display:flex;flex-direction:column;justify-content:center;
-  padding:48px 56px;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  padding:48px 40px;
   background:#07100B;
   border-left:1px solid rgba(16,185,129,0.08);
   position:relative;
@@ -207,7 +208,7 @@ const CSS = `
   pointer-events:none;
 }
 
-.ra-form-wrap{position:relative;z-index:1;max-width:360px;width:100%;}
+.ra-form-wrap{position:relative;z-index:1;width:100%;max-width:400px;}
 
 .ra-form-title{
   font-size:24px;font-weight:800;letter-spacing:-0.6px;color:#F0FBF4;
