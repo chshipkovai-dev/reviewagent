@@ -280,8 +280,8 @@ function Landing() {
             <span className="ld-logo-name">ReviewAgent</span>
           </a>
           <div className="ld-nav-right">
-            <a href="#how-it-works" className="ld-nav-link">How it works</a>
             <a href="#pricing" className="ld-nav-link">Pricing</a>
+            <div style={{ width:1, height:16, background:'rgba(240,251,244,0.12)' }} />
             <a href="/login" className="ld-nav-btn">Sign in</a>
           </div>
         </nav>
