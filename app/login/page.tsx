@@ -203,11 +203,18 @@ const CSS = `
 .ra-tab.on{background:rgba(16,185,129,0.12);color:#10B981;}
 
 /* fields */
-.ra-field{margin-bottom:14px;}
+.ra-field{margin-bottom:14px;position:relative;}
 .ra-label{font-size:11px;font-weight:700;color:rgba(240,251,244,0.35);display:block;margin-bottom:7px;letter-spacing:0.5px;text-transform:uppercase;}
-.ra-input{width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:11px;padding:13px 15px;color:#F0FBF4;font-size:14px;outline:none;transition:all 0.2s;}
+.ra-input{width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:11px;padding:13px 44px 13px 15px;color:#F0FBF4;font-size:14px;outline:none;transition:all 0.2s;}
 .ra-input::placeholder{color:rgba(240,251,244,0.18);}
 .ra-input:focus{border-color:rgba(16,185,129,0.5);background:rgba(16,185,129,0.04);box-shadow:0 0 0 3px rgba(16,185,129,0.1);}
+.ra-eye{position:absolute;right:13px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:rgba(240,251,244,0.3);font-size:15px;line-height:1;padding:2px;transition:color 0.15s;}
+.ra-eye:hover{color:rgba(240,251,244,0.6);}
+/* strength */
+.ra-strength{margin:-6px 0 10px;}
+.ra-strength-bar{height:3px;border-radius:2px;background:rgba(255,255,255,0.06);overflow:hidden;margin-bottom:4px;}
+.ra-strength-fill{height:100%;border-radius:2px;transition:all 0.35s;}
+.ra-strength-label{font-size:11px;font-weight:600;}
 
 .ra-forgot{text-align:right;margin:-6px 0 14px;}
 .ra-forgot button{background:none;border:none;cursor:pointer;font-size:12px;color:rgba(16,185,129,0.55);transition:color 0.15s;}
@@ -321,12 +328,26 @@ function DemoPanel({ tr }: { tr: typeof T['en'] }) {
   )
 }
 
+function getStrength(pw: string): { label: string; color: string; width: string } {
+  if (!pw) return { label: '', color: 'transparent', width: '0%' }
+  let score = 0
+  if (pw.length >= 8) score++
+  if (pw.length >= 12) score++
+  if (/[0-9]/.test(pw) && /[a-zA-Z]/.test(pw)) score++
+  if (/[^a-zA-Z0-9]/.test(pw)) score++
+  if (score <= 1) return { label: 'Weak', color: '#FF4D6B', width: '25%' }
+  if (score === 2) return { label: 'Fair', color: '#F59E0B', width: '55%' }
+  return { label: 'Strong', color: '#10B981', width: '100%' }
+}
+
 export default function LoginPage() {
   const [mode, setMode] = useState<Mode>('signin')
   const [lang, setLang] = useState<Lang>('en')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirm, setConfirm] = useState('')
+  const [showPw, setShowPw] = useState(false)
+  const [showConfirm, setShowConfirm] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
@@ -340,7 +361,7 @@ export default function LoginPage() {
 
   const tr = T[lang]
   function switchLang(l: Lang) { setLang(l); localStorage.setItem('ra_lang', l) }
-  function switchMode(m: Mode) { setMode(m); setError(null); setSuccess(null); setPassword(''); setConfirm('') }
+  function switchMode(m: Mode) { setMode(m); setError(null); setSuccess(null); setPassword(''); setConfirm(''); setShowPw(false); setShowConfirm(false) }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -348,20 +369,21 @@ export default function LoginPage() {
     if (mode === 'signup' && password !== confirm) { setError(tr.errMatch); return }
     if (mode !== 'reset' && password.length < 8) { setError(tr.errShort); return }
     setLoading(true)
+    const trimmedEmail = email.trim().toLowerCase()
     try {
       if (mode === 'signin') {
-        const { error } = await supabase.auth.signInWithPassword({ email, password })
+        const { error } = await supabase.auth.signInWithPassword({ email: trimmedEmail, password })
         if (error) throw error
         router.push('/')
       } else if (mode === 'signup') {
         const { error } = await supabase.auth.signUp({
-          email, password,
+          email: trimmedEmail, password,
           options: { emailRedirectTo: `${window.location.origin}/auth/callback` }
         })
         if (error) throw error
         setSuccess(tr.successSignUp)
       } else {
-        const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        const { error } = await supabase.auth.resetPasswordForEmail(trimmedEmail, {
           redirectTo: `${window.location.origin}/reset-password`,
         })
         if (error) throw error
@@ -459,20 +481,42 @@ export default function LoginPage() {
               </div>
 
               {mode !== 'reset' && (
-                <div className="ra-field">
-                  <label className="ra-label">{tr.labelPassword}</label>
-                  <input type="password" className="ra-input" placeholder={tr.placeholderPassword}
-                    value={password} onChange={e => setPassword(e.target.value)}
-                    disabled={loading} autoComplete={mode === 'signin' ? 'current-password' : 'new-password'} />
-                </div>
+                <>
+                  <div className="ra-field">
+                    <label className="ra-label">{tr.labelPassword}</label>
+                    <input
+                      type={showPw ? 'text' : 'password'} className="ra-input"
+                      placeholder={tr.placeholderPassword}
+                      value={password} onChange={e => setPassword(e.target.value)}
+                      disabled={loading} autoComplete={mode === 'signin' ? 'current-password' : 'new-password'}
+                    />
+                    <button type="button" className="ra-eye" onClick={() => setShowPw(v => !v)}>
+                      {showPw ? '🙈' : '👁'}
+                    </button>
+                  </div>
+                  {mode === 'signup' && password && (
+                    <div className="ra-strength">
+                      <div className="ra-strength-bar">
+                        <div className="ra-strength-fill" style={{ width: getStrength(password).width, background: getStrength(password).color }} />
+                      </div>
+                      <div className="ra-strength-label" style={{ color: getStrength(password).color }}>{getStrength(password).label}</div>
+                    </div>
+                  )}
+                </>
               )}
 
               {mode === 'signup' && (
                 <div className="ra-field">
                   <label className="ra-label">{tr.labelConfirm}</label>
-                  <input type="password" className="ra-input" placeholder={tr.placeholderPassword}
+                  <input
+                    type={showConfirm ? 'text' : 'password'} className="ra-input"
+                    placeholder={tr.placeholderPassword}
                     value={confirm} onChange={e => setConfirm(e.target.value)}
-                    disabled={loading} autoComplete="new-password" />
+                    disabled={loading} autoComplete="new-password"
+                  />
+                  <button type="button" className="ra-eye" onClick={() => setShowConfirm(v => !v)}>
+                    {showConfirm ? '🙈' : '👁'}
+                  </button>
                 </div>
               )}
 
