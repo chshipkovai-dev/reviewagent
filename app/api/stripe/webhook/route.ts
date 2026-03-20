@@ -12,13 +12,20 @@ const supabase = createClient(
 )
 
 export async function POST(req: NextRequest) {
+  // Guard: Stripe must be configured in production
+  if (!process.env.STRIPE_SECRET_KEY || process.env.STRIPE_SECRET_KEY === 'placeholder') {
+    console.error('Stripe is not configured')
+    return NextResponse.json({ error: 'Payment system not configured' }, { status: 503 })
+  }
+
   const body = await req.text()
   const sig = req.headers.get('stripe-signature')!
 
   let event: Stripe.Event
   try {
     event = stripe.webhooks.constructEvent(body, sig, process.env.STRIPE_WEBHOOK_SECRET!)
-  } catch {
+  } catch (e) {
+    console.error('Webhook signature failed:', e instanceof Error ? e.message : e)
     return NextResponse.json({ error: 'Invalid signature' }, { status: 400 })
   }
 

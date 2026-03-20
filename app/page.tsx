@@ -222,6 +222,18 @@ const LANDING_CSS = `
 .ld-plan-cta:hover{transform:translateY(-1px);box-shadow:0 8px 28px rgba(16,185,129,0.35);}
 .ld-plan-guarantee{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:16px;font-size:12px;color:rgba(240,251,244,0.3);}
 
+/* ── WAITLIST FORM ── */
+.ld-wl-form{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+.ld-wl-form-center{justify-content:center;}
+.ld-wl-input{flex:1;min-width:220px;padding:13px 16px;background:rgba(240,251,244,0.06);border:1px solid rgba(16,185,129,0.25);border-radius:10px;color:#F0FBF4;font-size:15px;outline:none;transition:border 0.2s;}
+.ld-wl-input::placeholder{color:rgba(240,251,244,0.3);}
+.ld-wl-input:focus{border-color:rgba(16,185,129,0.6);}
+.ld-wl-btn{padding:13px 22px;background:linear-gradient(135deg,#059669,#10B981);border:none;border-radius:10px;color:#fff;font-size:15px;font-weight:700;cursor:pointer;white-space:nowrap;transition:opacity 0.2s,transform 0.2s;}
+.ld-wl-btn:hover:not(:disabled){opacity:0.9;transform:translateY(-1px);}
+.ld-wl-btn:disabled{opacity:0.6;cursor:not-allowed;}
+.ld-wl-success{padding:14px 20px;background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.3);border-radius:10px;color:#34D399;font-size:15px;font-weight:600;}
+.ld-wl-err{width:100%;font-size:13px;color:#F87171;margin-top:4px;}
+
 /* ── CTA BANNER ── */
 .ld-cta-banner{
   position:relative;z-index:1;
@@ -268,6 +280,52 @@ const LANDING_CSS = `
 
 // ── LANDING COMPONENT ────────────────────────────────────
 function Landing() {
+  const [wlEmail, setWlEmail] = useState('')
+  const [wlStatus, setWlStatus] = useState<'idle'|'loading'|'success'|'error'>('idle')
+
+  async function handleWaitlist(e: React.FormEvent) {
+    e.preventDefault()
+    if (!wlEmail || wlStatus === 'loading' || wlStatus === 'success') return
+    setWlStatus('loading')
+    try {
+      const res = await fetch('/api/waitlist', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: wlEmail }),
+      })
+      if (res.ok) {
+        setWlStatus('success')
+      } else {
+        setWlStatus('error')
+      }
+    } catch {
+      setWlStatus('error')
+    }
+  }
+
+  const WaitlistForm = ({ variant = 'default' }: { variant?: 'default' | 'center' }) => (
+    wlStatus === 'success' ? (
+      <div className="ld-wl-success" style={{ textAlign: variant === 'center' ? 'center' : 'left' }}>
+        <span>🎉</span> You&apos;re on the list! We&apos;ll email you when we launch.
+      </div>
+    ) : (
+      <form className={`ld-wl-form${variant === 'center' ? ' ld-wl-form-center' : ''}`} onSubmit={handleWaitlist}>
+        <input
+          type="email"
+          className="ld-wl-input"
+          placeholder="your@email.com"
+          value={wlEmail}
+          onChange={e => setWlEmail(e.target.value)}
+          required
+        />
+        <button type="submit" className="ld-wl-btn" disabled={wlStatus === 'loading'}>
+          {wlStatus === 'loading' ? 'Joining…' : 'Get early access →'}
+        </button>
+        {wlStatus === 'error' && <div className="ld-wl-err">Something went wrong, try again.</div>}
+      </form>
+    )
+  )
+
   return (
     <>
       <style dangerouslySetInnerHTML={{ __html: LANDING_CSS }} />
@@ -291,27 +349,23 @@ function Landing() {
           <div className="ld-hero-left">
             <div className="ld-hero-badge">
               <div className="ld-live-dot" />
-              AI-powered · Ready in seconds
+              Google Business Integration · Early Access
             </div>
             <h1 className="ld-h1">
-              Every review<br/>deserves a<br/><span>perfect reply.</span>
+              Your AI agent that<br/>replies to every<br/><span>Google review.</span>
             </h1>
             <p className="ld-hero-sub">
-              AI writes professional responses to your Google reviews in seconds.
-              Stop losing customers to unanswered feedback.
+              Connect your Google Business Profile once — ReviewAgent automatically reads new reviews and posts professional replies. You just watch.
             </p>
             <div className="ld-hero-cta">
-              <a href="/login" className="ld-btn-primary">
-                Start free 7-day trial →
-              </a>
-              <a href="#how-it-works" className="ld-btn-secondary">See how it works</a>
+              <WaitlistForm />
             </div>
             <div className="ld-trust">
-              <div className="ld-trust-item">✓ No credit card</div>
+              <div className="ld-trust-item">✓ No manual copy-paste</div>
               <div className="ld-trust-dot" />
-              <div className="ld-trust-item">✓ Cancel anytime</div>
+              <div className="ld-trust-item">✓ Works automatically</div>
               <div className="ld-trust-dot" />
-              <div className="ld-trust-item">✓ Works with Google Reviews</div>
+              <div className="ld-trust-item">✓ Early bird pricing</div>
             </div>
           </div>
 
@@ -474,9 +528,9 @@ function Landing() {
                   </li>
                 ))}
               </ul>
-              <a href="/login" className="ld-plan-cta">Start free 7-day trial →</a>
-              <div className="ld-plan-guarantee">
-                <span>🔒</span> 30-day money-back guarantee · Powered by Stripe
+              <WaitlistForm variant="center" />
+              <div className="ld-plan-guarantee" style={{ marginTop:16 }}>
+                <span>🎯</span> Early bird pricing — locked in for waitlist members
               </div>
             </div>
           </div>
@@ -490,12 +544,12 @@ function Landing() {
           </div>
           <div style={{ maxWidth:640, margin:'0 auto', display:'flex', flexDirection:'column', gap:12 }}>
             {[
-              { q: 'Do I need to connect my Google account?', a: 'No. You paste your reviews into ReviewAgent, get the AI-written replies, and copy them to Google yourself. No API keys, no integrations needed.' },
+              { q: 'How does the Google Business integration work?', a: 'You connect your Google Business Profile once via OAuth. ReviewAgent then automatically reads your new reviews and posts professional replies — no manual work required.' },
               { q: 'What kind of businesses does this work for?', a: 'Any local business with Google reviews — restaurants, cafes, salons, barbershops, fitness studios, dental clinics, and more.' },
-              { q: 'How does the 7-day free trial work?', a: 'You get full access for 7 days with no charge. Enter your card at signup — if you cancel before the trial ends, you pay nothing.' },
-              { q: 'Can I cancel anytime?', a: 'Yes. Cancel from your account settings at any time. No questions, no cancellation fees.' },
-              { q: 'Are my reviews stored or shared?', a: 'No. Reviews you paste are processed in real time to generate replies and are not stored on our servers.' },
-              { q: 'What if I don\'t like the generated reply?', a: 'You always review the reply before posting it. Edit it, regenerate, or ignore it — you\'re always in control.' },
+              { q: 'Do I need to approve every reply before it posts?', a: 'You choose. Run in auto-pilot mode and replies post automatically, or turn on approval mode and confirm each reply before it goes live.' },
+              { q: 'What is early bird pricing?', a: 'Waitlist members lock in a discounted price that stays for as long as they keep their subscription. Price goes up at public launch.' },
+              { q: 'Are my reviews stored or shared?', a: 'No. Reviews are fetched and processed in real time. We do not store the content of your reviews or replies on our servers.' },
+              { q: 'When do you launch?', a: 'We are in final development. Waitlist members will get access first — sign up above to be notified.' },
             ].map(({ q, a }) => (
               <details key={q} style={{ background:'var(--elevated)', border:'1px solid var(--border)', borderRadius:12, padding:'16px 20px', cursor:'pointer' }}>
                 <summary style={{ fontWeight:600, fontSize:14, color:'var(--text)', listStyle:'none', display:'flex', justifyContent:'space-between', alignItems:'center', gap:12 }}>
@@ -510,10 +564,10 @@ function Landing() {
 
         {/* CTA BANNER */}
         <div className="ld-cta-banner">
-          <h2 className="ld-cta-title">Stop leaving reviews<br/><span>unanswered.</span></h2>
-          <p className="ld-cta-sub">Every unanswered review is a missed chance to win back a customer.</p>
+          <h2 className="ld-cta-title">Be first when<br/><span>we launch.</span></h2>
+          <p className="ld-cta-sub">Join the waitlist — early access + locked-in early bird pricing.</p>
           <div className="ld-cta-btns">
-            <a href="/login" className="ld-btn-primary">Start free 7-day trial →</a>
+            <WaitlistForm variant="center" />
           </div>
         </div>
 
@@ -675,6 +729,15 @@ export default function Home() {
   }, [])
 
   useEffect(() => {
+    // Clean up Supabase error params from URL (e.g. otp_expired after clicking old link)
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search)
+      const hash = window.location.hash
+      if (params.get('error') || hash.includes('error=')) {
+        window.history.replaceState({}, '', '/')
+      }
+    }
+
     supabase.auth.getUser().then(({ data }) => {
       if (data.user) {
         setUser(data.user)
